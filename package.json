@@ -1,0 +1,82 @@
+{
+  "name": "richlab",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "NODE_ENV=development electron .",
+    "deploy:osx": "electron-builder --mac",
+    "deploy:win": "npm run deploy:win32 && npm run deploy:win64",
+    "deploy:win32": "electron-builder --win nsis:ia32",
+    "deploy:win64": "electron-builder --win nsis:x64"
+  },
+  "build": {
+    "productName": "Rich Lab",
+    "appId": "store.richlab",
+    "asar": true,
+    "mac": {
+      "target": [
+        "default"
+      ]
+    },
+    "dmg": {
+      "title": "Rich Lab"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true
+    },
+    "directories": {
+      "buildResources": "./resources/installer/",
+      "output": "./dist/",
+      "app": "."
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "page/**/*",
+      "css/**/*",
+      "service/**/*",
+      "node_modules/**/*",
+      {
+        "from": "service/chromedriver",
+        "to": "chromedriver",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "extraMetadata": {
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^30.0.9",
+    "electron-builder": "^25.0.0-alpha.9"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "chromedriver": "^125.0.3",
+    "csv-parser": "^3.0.0",
+    "fs": "^0.0.1-security",
+    "jquery": "^3.7.1",
+    "selenium-webdriver": "^4.21.0"
+  }
+}

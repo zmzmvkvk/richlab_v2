@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <title>CSV 변환</title>
+    <style>
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>안녕하세요 <span id="username"></span>님</h1>
+        <div class="input-group">
+            <input type="file" id="csvFile" accept=".csv">
+            <label for="csvFile">CSV 파일 선택</label>
+        </div>
+        <button class="btn" id="convertBtn">변환하기</button>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require("electron");
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ipcRenderer.send('selenium-page-loaded');
+
+            ipcRenderer.on('user-data', (event, userData) => {
+                if (userData.error) {
+                    alert(userData.error);
+                    window.location.href = '../index.html';
+                } else {
+                    document.querySelector("#username").innerHTML = userData.username;
+                }
+            });
+
+            ipcRenderer.send('get-chromedriver-path');
+            
+            ipcRenderer.on('chromedriver-path', (event, path) => {
+                console.log('ChromeDriver Path:', path);
+            });
+        });
+        
+        
+
+        document.getElementById('csvFile').addEventListener('change', function(event) {
+            const fileName = event.target.files[0].name;
+            document.querySelector('label[for="csvFile"]').textContent = fileName;
+        });
+
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('csvFile');
+            
+            if (fileInput.files.length === 0) {
+                alert('CSV 파일을 선택해주세요.');
+                return;
+            } else {
+                const filePath = fileInput.files[0].path;
+                alert('파일 변환을 시작합니다.');
+                ipcRenderer.send('run-selenium', { filePath });
+            }
+        });
+    </script>
+</body>
+</html>
