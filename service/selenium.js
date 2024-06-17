@@ -3,6 +3,7 @@ const chrome = require('selenium-webdriver/chrome');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const { log } = require("electron-log");
 
 let chromeDriverPath;
 
@@ -19,7 +20,7 @@ const getChromeDriverPath = () => {
   return chromeDriverPath;
 };
 
-const runSelenium = async (filePath) => {
+const runSelenium = async (filePath, userData) => {
   const fileCsv = fs.readFileSync(filePath).toString('utf-8');
   
   try {
@@ -32,17 +33,27 @@ const runSelenium = async (filePath) => {
       .setChromeService(serviceBuilder)
       .build();
 
-    for (let url of urls) {
+    const generate = async (url, driver) => {
       try {
         await driver.get(url);
-        console.log(`Successfully visited ${url}`);
+        log("-----generate------");
+        log(userData);
+      } catch (e) {
+        log(`error : ${e}`)
+      }
+    };
+
+    for (let url of urls) {
+      try {
+        await generate("https://smartstore.naver.com/ttokalmall/products/9657042387", driver);
+        // console.log(`Successfully visited ${url}`);
       } catch (error) {
-        console.error(`Error visiting ${url}:`, error);
+        log(`Error visiting ${url}:`, error);
       }
     }
 
   } catch (error) {
-    console.error('Error reading CSV file:', error);
+    log('Error reading CSV file:', error);
   } finally {
     await driver.quit();
   }

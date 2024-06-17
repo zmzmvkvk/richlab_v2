@@ -56,8 +56,9 @@
                 return;
             } else {
                 const filePath = fileInput.files[0].path;
+                const token = localStorage.getItem("token")
                 alert('파일 변환을 시작합니다.');
-                ipcRenderer.send('run-selenium', { filePath });
+                ipcRenderer.send('run-selenium', { filePath, token });
             }
         });
     </script>

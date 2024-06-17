@@ -5,7 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const csv = require('csv-parser');
 const { runSelenium, getChromeDriverPath } = require('./service/selenium');
-
+const { log } = require("electron-log");
 let mainWindow;
 let userData;
 
@@ -47,18 +47,18 @@ app.whenReady().then(() => {
         mainWindow.webContents.send('login-error', '아이디와 비밀번호를 확인해주세요');
       }
     })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+      .catch(error => {
+        log('Error:', error);
+      });
   });
   
   ipcMain.on('selenium-page-loaded', async (e) => {
     try {
-        e.sender.send('user-data', userData);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        e.sender.send('user-data', { error: 'Failed to fetch user data' });
-      }
+      e.sender.send('user-data', userData);
+    } catch (error) {
+      log('Error fetching user data:', error);
+      e.sender.send('user-data', { error: 'Failed to fetch user data' });
+    }
   });
 
 
@@ -66,11 +66,11 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
-  ipcMain.on("run-selenium", (e, { filePath }) => {
-    runSelenium(filePath).then(() => {
-      console.log('크롤링 작업 완료');
+  ipcMain.on("run-selenium", async (e, { filePath }) => {
+    await runSelenium(filePath, userData).then(() => {
+      log('크롤링 작업 완료');
     }).catch(err => {
-      console.error('크롤링 작업 중 오류 발생:', err);
+      log('크롤링 작업 중 오류 발생:', err);
     });
   });
 
